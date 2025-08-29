@@ -8,7 +8,7 @@
 - Lucas Santana
 
 ## Objetivo da Aplicação
-Desenvolver um sistema de gerenciamento de biblioteca que realiza operações de CRUD (criar, ler, atualizar e deletar) para autores, livros e usuários, atendendo aos requisitos da disciplina de Banco de Dados. O sistema permite manipulação dos dados tanto em banco relacional (PostgreSQL) quanto NoSQL (MongoDB), incluindo o relacionamento entre livros e autores.
+Desenvolver um sistema de gerenciamento de biblioteca que realiza operações de CRUD (criar, ler, atualizar e deletar) para autores, livros, usuários e empréstimos, atendendo aos requisitos da disciplina de Banco de Dados. O sistema permite manipulação dos dados tanto em banco relacional (PostgreSQL) quanto NoSQL (MongoDB), incluindo o relacionamento entre livros e autores e o registro de empréstimos.
 
 ## Tecnologias Utilizadas
 - Go (Golang)
@@ -30,10 +30,12 @@ repository/
     mongo_autor.go
     mongo_livro.go
     mongo_usuario.go
+    mongo_emprestimo.go
   postgres/
     postgres_autor.go
     postgres_livro.go
     postgres_usuario.go
+    postgres_emprestimo.go
 ```
 
 ## Como Configurar e Executar o Projeto
@@ -58,6 +60,20 @@ repository/
      go run main.go
      ```
    - Siga o menu interativo para realizar as operações de CRUD.
+   - O menu inclui opções para:
+     - Usuário: criar, ler, atualizar, deletar
+     - Livro: criar, ler, deletar
+     - Autor: criar, ler, deletar, relacionar com livro
+     - Empréstimo: criar, ler, atualizar, deletar
+
+## CRUD de Empréstimo
+No menu principal, utilize as opções 10 a 13 para:
+- Criar empréstimo: informe ID (int), status (A/D/C), quantidade de livros, CPF do cliente/usuário
+- Ler empréstimo por ID
+- Atualizar empréstimo
+- Deletar empréstimo
+
+O campo status aceita apenas os valores: 'A', 'D', 'C'. O CPF deve existir na tabela Cliente.
 
 ## Observações
 - Para testar todos os métodos, utilize o menu do sistema e confira o efeito das operações diretamente no banco de dados (usando pgAdmin, DBeaver ou MongoDB Compass).
