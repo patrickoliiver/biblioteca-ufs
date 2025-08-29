@@ -11,8 +11,12 @@ import (
 )
 
 func ConnectPostgres() (*pgx.Conn, error) {
-	// substituir pela sua string de conexão do postgres
-	connStr := "postgresql://principal:senha-principa@database-postgre-bd1-2025-1.cdwk8iisko7f.us-east-1.rds.amazonaws.com:5432/postgres?sslmode=require"
+	// string de conexão agora vem da variável de ambiente
+	connStr := os.Getenv("POSTGRES_CONN")
+	if connStr == "" {
+		fmt.Fprintf(os.Stderr, "Variável de ambiente POSTGRES_CONN não definida.\n")
+		return nil, fmt.Errorf("variável de ambiente POSTGRES_CONN não definida")
+	}
 	conn, err := pgx.Connect(context.Background(), connStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Não foi possível conectar ao PostgreSQL: %v\n", err)
