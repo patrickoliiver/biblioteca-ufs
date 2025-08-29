@@ -14,9 +14,14 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Carrega variáveis do arquivo .env automaticamente
+	_ = godotenv.Load()
+
 	ctx := context.Background()
 	reader := bufio.NewReader(os.Stdin)
 
@@ -24,6 +29,7 @@ func main() {
 	var userRepo repository.UsuarioRepository
 	var livroRepo repository.LivroRepository
 	var autorRepo repository.AutorRepository
+	var emprestimoRepo repository.EmprestimoRepository
 
 	fmt.Println("Bem-vindo ao sistema de gerenciamento da biblioteca!")
 	fmt.Println("Qual banco de dados você deseja usar?")
@@ -45,6 +51,7 @@ func main() {
 		userRepo = postgresRepo.NewUsuarioRepository(pgConn)
 		livroRepo = postgresRepo.NewLivroRepository(pgConn)
 		autorRepo = postgresRepo.NewAutorRepository(pgConn)
+		emprestimoRepo = postgresRepo.NewEmprestimoRepository(pgConn)
 	case "2":
 		log.Println("Conectando ao MongoDB...")
 		mongoClient, err := database.ConnectMongoDB()
@@ -56,6 +63,7 @@ func main() {
 		userRepo = mongoRepo.NewUsuarioRepository(db)
 		livroRepo = mongoRepo.NewLivroRepository(db)
 		autorRepo = mongoRepo.NewAutorRepository(db)
+		emprestimoRepo = mongoRepo.NewEmprestimoRepository(db)
 	default:
 		log.Fatal("Opção inválida. Saindo.")
 		return
@@ -75,6 +83,11 @@ func main() {
 		fmt.Println("7: Deletar Livro")
 		fmt.Println("8: Adicionar Autor a um Livro (Criar Relacionamento)")
 		fmt.Println("9: Remover Autor de um Livro (Deletar Relacionamento E Autor)")
+		fmt.Println("--- Entidade: Empréstimo ---")
+		fmt.Println("10: Criar Empréstimo")
+		fmt.Println("11: Ler Empréstimo por ID")
+		fmt.Println("12: Atualizar Empréstimo")
+		fmt.Println("13: Deletar Empréstimo")
 		fmt.Println("-------------------------------")
 		fmt.Println("0: Sair")
 		fmt.Print("Escolha uma opção: ")
@@ -101,6 +114,14 @@ func main() {
 			handleAddAutorRelacionamento(ctx, livroRepo, autorRepo, reader)
 		case "9":
 			handleRemoveAutorRelacionamento(ctx, livroRepo, autorRepo, reader)
+		case "10":
+			handleCreateEmprestimo(ctx, emprestimoRepo, reader)
+		case "11":
+			handleReadEmprestimo(ctx, emprestimoRepo, reader)
+		case "12":
+			handleUpdateEmprestimo(ctx, emprestimoRepo, reader)
+		case "13":
+			handleDeleteEmprestimo(ctx, emprestimoRepo, reader)
 		case "0":
 			log.Println("Saindo do sistema. Até logo!")
 			return
@@ -111,6 +132,136 @@ func main() {
 }
 
 // funções auxiliares
+// CRUD de Empréstimo
+func handleCreateEmprestimo(ctx context.Context, repo repository.EmprestimoRepository, reader *bufio.Reader) {
+	fmt.Print("Digite o ID do empréstimo (número inteiro): ")
+	idStr, _ := reader.ReadString('\n')
+	idStr = strings.TrimSpace(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Printf("ERRO: ID inválido. %v\n", err)
+		return
+	}
+
+	dataEmprestimo := time.Now()
+
+	fmt.Print("Digite o status do empréstimo: ")
+	status, _ := reader.ReadString('\n')
+	status = strings.TrimSpace(status)
+
+	fmt.Print("Digite a quantidade de livros: ")
+	quantLivrosStr, _ := reader.ReadString('\n')
+	quantLivrosStr = strings.TrimSpace(quantLivrosStr)
+	quantLivros, err := strconv.Atoi(quantLivrosStr)
+	if err != nil {
+		log.Printf("ERRO: Quantidade de livros inválida. %v\n", err)
+		return
+	}
+
+	fmt.Print("Digite o CPF do cliente/usuário: ")
+	clienteCPF, _ := reader.ReadString('\n')
+	clienteCPF = strings.TrimSpace(clienteCPF)
+
+	novoEmprestimo := model.Emprestimo{
+		ID:                id,
+		DataEmprestimo:    dataEmprestimo,
+		Status:            status,
+		QuantLivros:       quantLivros,
+		ClienteUsuarioCPF: clienteCPF,
+	}
+
+	if err := repo.Create(ctx, novoEmprestimo); err != nil {
+		log.Printf("ERRO: Não foi possível criar o empréstimo. %v\n", err)
+	} else {
+		log.Println("SUCESSO: Empréstimo criado. Verifique o banco de dados.")
+	}
+}
+
+func handleReadEmprestimo(ctx context.Context, repo repository.EmprestimoRepository, reader *bufio.Reader) {
+	fmt.Print("Digite o ID do empréstimo a ser lido (número inteiro): ")
+	idStr, _ := reader.ReadString('\n')
+	idStr = strings.TrimSpace(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Printf("ERRO: ID inválido. %v\n", err)
+		return
+	}
+
+	emprestimo, err := repo.GetByID(ctx, id)
+	if err != nil {
+		log.Printf("ERRO: Empréstimo com ID '%d' não encontrado. %v\n", id, err)
+	} else {
+		log.Printf("SUCESSO: Empréstimo encontrado: %+v\n", *emprestimo)
+	}
+}
+
+func handleUpdateEmprestimo(ctx context.Context, repo repository.EmprestimoRepository, reader *bufio.Reader) {
+	fmt.Print("Digite o ID do empréstimo a ser atualizado (número inteiro): ")
+	idStr, _ := reader.ReadString('\n')
+	idStr = strings.TrimSpace(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Printf("ERRO: ID inválido. %v\n", err)
+		return
+	}
+
+	emprestimo, err := repo.GetByID(ctx, id)
+	if err != nil {
+		log.Printf("ERRO: Empréstimo com ID '%d' não encontrado para atualizar. %v\n", id, err)
+		return
+	}
+	log.Printf("Atualizando empréstimo: %+v\n", *emprestimo)
+
+	fmt.Printf("Digite o novo status (atual: %s): ", emprestimo.Status)
+	status, _ := reader.ReadString('\n')
+	status = strings.TrimSpace(status)
+	if status != "" {
+		emprestimo.Status = status
+	}
+
+	fmt.Printf("Digite a nova quantidade de livros (atual: %d): ", emprestimo.QuantLivros)
+	quantLivrosStr, _ := reader.ReadString('\n')
+	quantLivrosStr = strings.TrimSpace(quantLivrosStr)
+	if quantLivrosStr != "" {
+		quantLivros, err := strconv.Atoi(quantLivrosStr)
+		if err == nil {
+			emprestimo.QuantLivros = quantLivros
+		}
+	}
+
+	fmt.Printf("Digite o novo CPF do cliente/usuário (atual: %s): ", emprestimo.ClienteUsuarioCPF)
+	clienteCPF, _ := reader.ReadString('\n')
+	clienteCPF = strings.TrimSpace(clienteCPF)
+	if clienteCPF != "" {
+		emprestimo.ClienteUsuarioCPF = clienteCPF
+	}
+
+	// Atualiza data do empréstimo para agora
+	emprestimo.DataEmprestimo = time.Now()
+
+	if err := repo.Update(ctx, *emprestimo); err != nil {
+		log.Printf("ERRO: Não foi possível atualizar o empréstimo. %v\n", err)
+	} else {
+		log.Println("SUCESSO: Empréstimo atualizado. Verifique o banco de dados.")
+	}
+}
+
+func handleDeleteEmprestimo(ctx context.Context, repo repository.EmprestimoRepository, reader *bufio.Reader) {
+	fmt.Print("Digite o ID do empréstimo a ser deletado (número inteiro): ")
+	idStr, _ := reader.ReadString('\n')
+	idStr = strings.TrimSpace(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Printf("ERRO: ID inválido. %v\n", err)
+		return
+	}
+
+	if err := repo.Delete(ctx, id); err != nil {
+		log.Printf("ERRO: Não foi possível deletar o empréstimo. %v\n", err)
+	} else {
+		log.Println("SUCESSO: Empréstimo deletado. Verifique o banco de dados.")
+	}
+}
 
 func handleCreateUsuario(ctx context.Context, repo repository.UsuarioRepository, reader *bufio.Reader) {
 	fmt.Print("Digite o CPF: ")

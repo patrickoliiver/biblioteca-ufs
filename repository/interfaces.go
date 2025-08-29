@@ -27,3 +27,10 @@ type LivroRepository interface {
 	AddAutor(ctx context.Context, isbn string, autor model.Autor) error
 	RemoveAutor(ctx context.Context, isbn string, autorID int) error
 }
+
+type EmprestimoRepository interface {
+	Create(ctx context.Context, emprestimo model.Emprestimo) error
+	GetByID(ctx context.Context, id int) (*model.Emprestimo, error)
+	Update(ctx context.Context, emprestimo model.Emprestimo) error
+	Delete(ctx context.Context, id int) error
+}

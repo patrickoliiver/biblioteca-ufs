@@ -27,3 +27,13 @@ type Livro struct {
 	FuncionarioMatricula int     `bson:"funcionario_matricula"`
 	Autores              []Autor `bson:"autores"` // relacionamento embutido para NoSQL
 }
+
+// Emprestimo representa a tabela no banco de dados
+// Atualizado para refletir os campos reais
+type Emprestimo struct {
+	ID                 int       `bson:"_id" json:"id"`
+	DataEmprestimo     time.Time `bson:"data_emprestimo" json:"data_emprestimo"`
+	Status             string    `bson:"status" json:"status"`
+	QuantLivros        int       `bson:"quant_livros" json:"quant_livros"`
+	ClienteUsuarioCPF  string    `bson:"cliente_usuario_cpf" json:"cliente_usuario_cpf"`
+}
