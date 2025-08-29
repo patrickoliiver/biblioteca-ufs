@@ -19,11 +19,27 @@ func (r *LivroRepository) Create(ctx context.Context, livro model.Livro) error {
 	_, err := r.Collection.InsertOne(ctx, livro)
 	return err
 }
+
 func (r *LivroRepository) GetByISBN(ctx context.Context, isbn string) (*model.Livro, error) {
 	var livro model.Livro
 	err := r.Collection.FindOne(ctx, bson.M{"_id": isbn}).Decode(&livro)
 	return &livro, err
 }
+
+func (r *LivroRepository) GetAll(ctx context.Context) ([]model.Livro, error) {
+	cursor, err := r.Collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var livros []model.Livro
+	if err = cursor.All(ctx, &livros); err != nil {
+		return nil, err
+	}
+	return livros, nil
+}
+
 func (r *LivroRepository) Update(ctx context.Context, livro model.Livro) error {
 	filter := bson.M{"_id": livro.ISBN}
 	update := bson.M{"$set": bson.M{
@@ -33,6 +49,7 @@ func (r *LivroRepository) Update(ctx context.Context, livro model.Livro) error {
 	_, err := r.Collection.UpdateOne(ctx, filter, update)
 	return err
 }
+
 func (r *LivroRepository) Delete(ctx context.Context, isbn string) error {
 	_, err := r.Collection.DeleteOne(ctx, bson.M{"_id": isbn})
 	return err

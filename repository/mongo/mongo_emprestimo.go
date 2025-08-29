@@ -30,6 +30,20 @@ func (r *EmprestimoRepository) GetByID(ctx context.Context, id int) (*model.Empr
 	return &emprestimo, nil
 }
 
+func (r *EmprestimoRepository) GetAll(ctx context.Context) ([]model.Emprestimo, error) {
+	cursor, err := r.Collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var emprestimos []model.Emprestimo
+	if err = cursor.All(ctx, &emprestimos); err != nil {
+		return nil, err
+	}
+	return emprestimos, nil
+}
+
 func (r *EmprestimoRepository) Update(ctx context.Context, emprestimo model.Emprestimo) error {
 	filter := bson.M{"_id": emprestimo.ID}
 	update := bson.M{"$set": bson.M{

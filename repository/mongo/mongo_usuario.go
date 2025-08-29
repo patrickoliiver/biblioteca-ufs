@@ -29,6 +29,20 @@ func (r *UsuarioRepository) GetByCPF(ctx context.Context, cpf string) (*model.Us
 	return &usuario, nil
 }
 
+func (r *UsuarioRepository) GetAll(ctx context.Context) ([]model.Usuario, error) {
+	cursor, err := r.Collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var usuarios []model.Usuario
+	if err = cursor.All(ctx, &usuarios); err != nil {
+		return nil, err
+	}
+	return usuarios, nil
+}
+
 func (r *UsuarioRepository) Update(ctx context.Context, usuario model.Usuario) error {
 	filter := bson.M{"_id": usuario.CPF}
 	update := bson.M{"$set": bson.M{

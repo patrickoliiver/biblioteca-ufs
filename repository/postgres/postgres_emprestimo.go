@@ -32,6 +32,25 @@ func (r *EmprestimoRepository) GetByID(ctx context.Context, id int) (*model.Empr
 	return &e, nil
 }
 
+func (r *EmprestimoRepository) GetAll(ctx context.Context) ([]model.Emprestimo, error) {
+	query := `SELECT id, data_emprestimo, status, quant_livros, cliente_usuario_cpf FROM "Projeto Logico".Emprestimo ORDER BY id`
+	rows, err := r.DB.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var emprestimos []model.Emprestimo
+	for rows.Next() {
+		var emprestimo model.Emprestimo
+		if err := rows.Scan(&emprestimo.ID, &emprestimo.DataEmprestimo, &emprestimo.Status, &emprestimo.QuantLivros, &emprestimo.ClienteUsuarioCPF); err != nil {
+			return nil, err
+		}
+		emprestimos = append(emprestimos, emprestimo)
+	}
+	return emprestimos, rows.Err()
+}
+
 func (r *EmprestimoRepository) Update(ctx context.Context, emprestimo model.Emprestimo) error {
 	query := `UPDATE "Projeto Logico".Emprestimo SET data_emprestimo = $1, status = $2, quant_livros = $3, cliente_usuario_cpf = $4 WHERE id = $5`
 	_, err := r.DB.Exec(ctx, query, emprestimo.DataEmprestimo, emprestimo.Status, emprestimo.QuantLivros, emprestimo.ClienteUsuarioCPF, emprestimo.ID)

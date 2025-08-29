@@ -28,6 +28,31 @@ func (r *AutorRepository) GetByID(ctx context.Context, id int) (*model.Autor, er
 	return &a, err
 }
 
+func (r *AutorRepository) GetAll(ctx context.Context) ([]model.Autor, error) {
+	query := `SELECT id, primeiro_nome, sobrenome FROM "Projeto Logico".Autor ORDER BY id`
+	rows, err := r.DB.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var autores []model.Autor
+	for rows.Next() {
+		var autor model.Autor
+		if err := rows.Scan(&autor.ID, &autor.PrimeiroNome, &autor.Sobrenome); err != nil {
+			return nil, err
+		}
+		autores = append(autores, autor)
+	}
+	return autores, rows.Err()
+}
+
+func (r *AutorRepository) Update(ctx context.Context, autor model.Autor) error {
+	query := `UPDATE "Projeto Logico".Autor SET primeiro_nome = $2, sobrenome = $3 WHERE id = $1`
+	_, err := r.DB.Exec(ctx, query, autor.ID, autor.PrimeiroNome, autor.Sobrenome)
+	return err
+}
+
 func (r *AutorRepository) Delete(ctx context.Context, id int) error {
 	query := `DELETE FROM "Projeto Logico".Autor WHERE id = $1`
 	_, err := r.DB.Exec(ctx, query, id)

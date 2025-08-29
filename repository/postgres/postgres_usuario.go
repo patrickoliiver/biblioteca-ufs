@@ -33,6 +33,26 @@ func (r *UsuarioRepository) GetByCPF(ctx context.Context, cpf string) (*model.Us
 	return &u, nil
 }
 
+func (r *UsuarioRepository) GetAll(ctx context.Context) ([]model.Usuario, error) {
+	query := `SELECT cpf, data_nascimento, sobrenome, primeiro_nome 
+	          FROM "Projeto Logico".Usuario ORDER BY cpf`
+	rows, err := r.DB.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var usuarios []model.Usuario
+	for rows.Next() {
+		var usuario model.Usuario
+		if err := rows.Scan(&usuario.CPF, &usuario.DataNascimento, &usuario.Sobrenome, &usuario.PrimeiroNome); err != nil {
+			return nil, err
+		}
+		usuarios = append(usuarios, usuario)
+	}
+	return usuarios, rows.Err()
+}
+
 func (r *UsuarioRepository) Update(ctx context.Context, usuario model.Usuario) error {
 	query := `UPDATE "Projeto Logico".Usuario 
 	          SET data_nascimento = $1, sobrenome = $2, primeiro_nome = $3 

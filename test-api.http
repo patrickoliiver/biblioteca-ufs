@@ -1,0 +1,268 @@
+### 🏛️ API da Biblioteca - Exemplos de Teste
+
+### Health Check
+GET http://localhost:8080/health
+
+### ===== POSTGRESQL TESTS =====
+
+### Criar Usuário (PostgreSQL)
+POST http://localhost:8080/postgres/usuarios
+Content-Type: application/json
+
+{
+  "cpf": "12345678901",
+  "primeiro_nome": "João",
+  "sobrenome": "Silva",
+  "data_nascimento": "1990-01-01T00:00:00Z"
+}
+
+### Listar Usuários (PostgreSQL)
+GET http://localhost:8080/postgres/usuarios
+
+### Atualizar Usuário (PostgreSQL)
+PUT http://localhost:8080/postgres/usuarios/12345678901
+Content-Type: application/json
+
+{
+  "cpf": "12345678901",
+  "primeiro_nome": "João Pedro",
+  "sobrenome": "Silva Santos",
+  "data_nascimento": "1990-01-01T00:00:00Z"
+}
+
+### Deletar Usuário (PostgreSQL)
+DELETE http://localhost:8080/postgres/usuarios/12345678901
+
+### ---
+
+### Criar Autor (PostgreSQL)
+POST http://localhost:8080/postgres/autores
+Content-Type: application/json
+
+{
+  "id": 1,
+  "primeiro_nome": "Machado",
+  "sobrenome": "de Assis"
+}
+
+### Listar Autores (PostgreSQL)
+GET http://localhost:8080/postgres/autores
+
+### Atualizar Autor (PostgreSQL)
+PUT http://localhost:8080/postgres/autores/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "primeiro_nome": "Joaquim Maria",
+  "sobrenome": "Machado de Assis"
+}
+
+### Deletar Autor (PostgreSQL)
+DELETE http://localhost:8080/postgres/autores/1
+
+### ---
+
+### Criar Livro (PostgreSQL)
+POST http://localhost:8080/postgres/livros
+Content-Type: application/json
+
+{
+  "isbn": "9788535902778",
+  "titulo": "Dom Casmurro",
+  "edicao": "1ª Edição",
+  "num_paginas": 256,
+  "editora_cnpj": "11222333000144",
+  "funcionario_matricula": 100,
+  "autores": []
+}
+
+### Listar Livros (PostgreSQL)
+GET http://localhost:8080/postgres/livros
+
+### Atualizar Livro (PostgreSQL)
+PUT http://localhost:8080/postgres/livros/9788535902778
+Content-Type: application/json
+
+{
+  "isbn": "9788535902778",
+  "titulo": "Dom Casmurro - Edição Especial",
+  "edicao": "2ª Edição",
+  "num_paginas": 256,
+  "editora_cnpj": "11222333000144",
+  "funcionario_matricula": 100,
+  "autores": []
+}
+
+### Deletar Livro (PostgreSQL)
+DELETE http://localhost:8080/postgres/livros/9788535902778
+
+### ---
+
+### Criar Empréstimo (PostgreSQL)
+POST http://localhost:8080/postgres/emprestimos
+Content-Type: application/json
+
+{
+  "id": 1,
+  "data_emprestimo": "2024-01-15T10:00:00Z",
+  "status": "A",
+  "quant_livros": 2,
+  "cliente_usuario_cpf": "12345678901"
+}
+
+### Listar Empréstimos (PostgreSQL)
+GET http://localhost:8080/postgres/emprestimos
+
+### Atualizar Empréstimo (PostgreSQL)
+PUT http://localhost:8080/postgres/emprestimos/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "data_emprestimo": "2024-01-15T10:00:00Z",
+  "status": "D",
+  "quant_livros": 1,
+  "cliente_usuario_cpf": "12345678901"
+}
+
+### Deletar Empréstimo (PostgreSQL)
+DELETE http://localhost:8080/postgres/emprestimos/1
+
+### ===== MONGODB TESTS =====
+
+### Criar Usuário (MongoDB)
+POST http://localhost:8080/mongo/usuarios
+Content-Type: application/json
+
+{
+  "cpf": "98765432109",
+  "primeiro_nome": "Maria",
+  "sobrenome": "Santos",
+  "data_nascimento": "1985-05-15T00:00:00Z"
+}
+
+### Listar Usuários (MongoDB)
+GET http://localhost:8080/mongo/usuarios
+
+### Atualizar Usuário (MongoDB)
+PUT http://localhost:8080/mongo/usuarios/98765432109
+Content-Type: application/json
+
+{
+  "cpf": "98765432109",
+  "primeiro_nome": "Maria Clara",
+  "sobrenome": "Santos Oliveira",
+  "data_nascimento": "1985-05-15T00:00:00Z"
+}
+
+### Deletar Usuário (MongoDB)
+DELETE http://localhost:8080/mongo/usuarios/98765432109
+
+### ---
+
+### Criar Autor (MongoDB)
+POST http://localhost:8080/mongo/autores
+Content-Type: application/json
+
+{
+  "id": 2,
+  "primeiro_nome": "Clarice",
+  "sobrenome": "Lispector"
+}
+
+### Listar Autores (MongoDB)
+GET http://localhost:8080/mongo/autores
+
+### Atualizar Autor (MongoDB)
+PUT http://localhost:8080/mongo/autores/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "primeiro_nome": "Clarice",
+  "sobrenome": "Lispector"
+}
+
+### Deletar Autor (MongoDB)
+DELETE http://localhost:8080/mongo/autores/2
+
+### ---
+
+### Criar Livro (MongoDB)
+POST http://localhost:8080/mongo/livros
+Content-Type: application/json
+
+{
+  "isbn": "9788535909555",
+  "titulo": "A Hora da Estrela",
+  "edicao": "1ª Edição",
+  "num_paginas": 88,
+  "editora_cnpj": "11222333000144",
+  "funcionario_matricula": 100,
+  "autores": [
+    {
+      "id": 2,
+      "primeiro_nome": "Clarice",
+      "sobrenome": "Lispector"
+    }
+  ]
+}
+
+### Listar Livros (MongoDB)
+GET http://localhost:8080/mongo/livros
+
+### Atualizar Livro (MongoDB)
+PUT http://localhost:8080/mongo/livros/9788535909555
+Content-Type: application/json
+
+{
+  "isbn": "9788535909555",
+  "titulo": "A Hora da Estrela - Edição Comemorativa",
+  "edicao": "2ª Edição",
+  "num_paginas": 88,
+  "editora_cnpj": "11222333000144",
+  "funcionario_matricula": 100,
+  "autores": [
+    {
+      "id": 2,
+      "primeiro_nome": "Clarice",
+      "sobrenome": "Lispector"
+    }
+  ]
+}
+
+### Deletar Livro (MongoDB)
+DELETE http://localhost:8080/mongo/livros/9788535909555
+
+### ---
+
+### Criar Empréstimo (MongoDB)
+POST http://localhost:8080/mongo/emprestimos
+Content-Type: application/json
+
+{
+  "id": 2,
+  "data_emprestimo": "2024-01-16T14:30:00Z",
+  "status": "A",
+  "quant_livros": 1,
+  "cliente_usuario_cpf": "98765432109"
+}
+
+### Listar Empréstimos (MongoDB)
+GET http://localhost:8080/mongo/emprestimos
+
+### Atualizar Empréstimo (MongoDB)
+PUT http://localhost:8080/mongo/emprestimos/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "data_emprestimo": "2024-01-16T14:30:00Z",
+  "status": "C",
+  "quant_livros": 1,
+  "cliente_usuario_cpf": "98765432109"
+}
+
+### Deletar Empréstimo (MongoDB)
+DELETE http://localhost:8080/mongo/emprestimos/2

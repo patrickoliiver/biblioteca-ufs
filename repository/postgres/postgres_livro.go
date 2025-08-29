@@ -29,6 +29,25 @@ func (r *LivroRepository) GetByISBN(ctx context.Context, isbn string) (*model.Li
 	return &l, err
 }
 
+func (r *LivroRepository) GetAll(ctx context.Context) ([]model.Livro, error) {
+	query := `SELECT isbn, titulo, edicao, num_paginas, editora_cnpj, funcionario_matricula FROM "Projeto Logico".Livro ORDER BY isbn`
+	rows, err := r.DB.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var livros []model.Livro
+	for rows.Next() {
+		var livro model.Livro
+		if err := rows.Scan(&livro.ISBN, &livro.Titulo, &livro.Edicao, &livro.NumPaginas, &livro.EditoraCNPJ, &livro.FuncionarioMatricula); err != nil {
+			return nil, err
+		}
+		livros = append(livros, livro)
+	}
+	return livros, rows.Err()
+}
+
 func (r *LivroRepository) Update(ctx context.Context, livro model.Livro) error {
 	query := `UPDATE "Projeto Logico".Livro SET titulo = $1, edicao = $2 WHERE isbn = $3`
 	_, err := r.DB.Exec(ctx, query, livro.Titulo, livro.Edicao, livro.ISBN)
